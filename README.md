@@ -10,6 +10,30 @@ A minimalist, modern architecture for building modular, testable, and maintainab
 Just functional slices of real business logic, with typed ports and clean boundaries.
 
 ---
+
+## 📈 Architecture Diagram
+
+![PASTA Architecture Diagram](./assets/PASTA-dark.png)
+
+> Each use case forms a **vertical slice**: its own logic, ports, and orchestration.  
+> No split projects per "layer". Functional cohesion lives within the slice.
+
+---
+
+## 💡 Key Concepts
+
+| Component                | Role                                                                 |
+|--------------------------|----------------------------------------------------------------------|
+| **Use Case (Slice)**     | Self-contained unit: handler, ports, business logic                  |
+| **Input Adapter**        | Accepts external input (HTTP, CLI, etc.), calls port delegate        |
+| **Output Adapter**       | Implements outbound ports (DB, Email, Storage)                       |
+| **Input Port**           | Delegate/function signature invoked by adapter                      |
+| **Output Port**          | Delegate passed into use case to abstract side-effects              |
+| **Core**                 | Pure logic: types, validators, calculators, etc.                     |
+| **App Orchestration**    | Wires ports to logic, defines what happens when and in what order    |
+
+---
+
 ## ✨ Philosophy
 
 PASTA is an architectural style for modern .NET (and beyond) projects that favors:
@@ -97,29 +121,6 @@ public delegate Task<Result<Order>> PlaceOrder(CustomerId id, ProductCode code);
 * Test core logic in isolation.
 
 * Service handlers are easy to test with hand-written or inline dependencies.
----
-
-## 📈 Architecture Diagram
-
-![PASTA Architecture Diagram](./assets/PASTA-dark.png)
-
-> Each use case forms a **vertical slice**: its own logic, ports, and orchestration.  
-> No split projects per "layer". Functional cohesion lives within the slice.
-
----
-
-## 💡 Key Concepts
-
-| Component                | Role                                                                 |
-|--------------------------|----------------------------------------------------------------------|
-| **Use Case (Slice)**     | Self-contained unit: handler, ports, business logic                  |
-| **Input Adapter**        | Accepts external input (HTTP, CLI, etc.), calls port delegate        |
-| **Output Adapter**       | Implements outbound ports (DB, Email, Storage)                       |
-| **Input Port**           | Delegate/function signature invoked by adapter                      |
-| **Output Port**          | Delegate passed into use case to abstract side-effects              |
-| **Core**                 | Pure logic: types, validators, calculators, etc.                     |
-| **App Orchestration**    | Wires ports to logic, defines what happens when and in what order    |
-
 ---
 
 ## 🧪 Sample Code
