@@ -1,5 +1,4 @@
-# 🍝 PASTA Architecture
-![PASTA logo](./assets/PASTA-logo.png)
+![PASTA logo](./assets/pasta_logo_small.png)
 
 > **PASTA** — _Ports🔹Adapters🔹Slices🔹Typed Abstractions🔹(Anti-Layers)_
 
