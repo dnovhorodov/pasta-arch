@@ -1,4 +1,5 @@
 # 🍝 PASTA Architecture
+![PASTA logo](./assets/PASTA-logo.png)
 
 > **PASTA** — _Ports🔹Adapters🔹Slices🔹Typed Abstractions🔹(Anti-Layers)_
 
@@ -49,6 +50,8 @@ PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative 
 ---
 
 ## 📜 PASTA Manifesto
+
+> "Layered systems are like overcooked spaghetti — sticky, tangled, and a pain to digest. PASTA serves it al dente."
 
 ### ❌ No More Overengineering
 
