@@ -22,16 +22,14 @@ Just functional slices of real business logic, with typed ports and clean bounda
 
 ## 💡 Key Concepts
 
-| Component             | Role                                                              |
-| --------------------- | ----------------------------------------------------------------- |
-| **Use Case (Slice)**  | Self-contained unit: handler, ports, business logic               |
-| **Input Adapter**     | Accepts external input (HTTP, CLI, etc.), calls port delegate     |
-| **Output Adapter**    | Implements outbound ports (DB, Email, Storage)                    |
-| **Handlers**          | Just functions or static orchestrators that implement use-cases   |
-| **Output Port**       | Delegate passed into use case to abstract side-effects            |
-| **Core**              | Pure logic: types, validators, calculators, etc.                  |
-| **App Orchestration** | Wires ports to logic, defines what happens when and in what order |
-
+| Component            | Role                                                            |
+| -------------------- | --------------------------------------------------------------- |
+| **Use Case (Slice)** | Self-contained unit: handler, ports, business logic             |
+| **Input Adapter**    | Accepts external input (HTTP, CLI, etc.), calls port delegate   |
+| **Output Adapter**   | Implements outbound ports (DB, Email, Storage)                  |
+| **Handlers**         | Just functions or static orchestrators that implement use-cases |
+| **Output Port**      | Delegate passed into use case to abstract side-effects          |
+| **Core**             | Pure logic: types, validators, calculators, etc.                |
 ---
 
 ## ✨ Philosophy
@@ -76,28 +74,8 @@ PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative 
 
 * In tests, replace ports with pure functions. No mocking frameworks needed.
 
-```csharp
-// A port
-public delegate Task<Result<Customer>> GetCustomerById(CustomerId id);
-
-// An adapter
-public static class CustomerAdapter
-{
-    public static async Task<Result<Customer>> GetCustomerById(CustomerId id) => ...
-}
-```
-
 ### 🧩 Service Handlers: Explicit and Focused
 
-```csharp
-public sealed record CreateOrderHandler(OrderRepository Repo, ILogger Log)
-{
-    public async Task<Result<Order>> Handle(CreateOrderCommand cmd)
-    {
-        // business logic here
-    }
-}
-```
 * No base classes, no magic.
 
 * Everything needed is passed via constructor (record positional args).
