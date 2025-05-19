@@ -13,7 +13,7 @@ Just functional slices of real business logic, with typed ports and clean bounda
 
 ## 📈 Architecture Diagram
 
-![PASTA Architecture Diagram](./assets/PASTA-dark.png)
+![PASTA Architecture Diagram](./assets/PASTA-t-d.png)
 
 > Each use case forms a **vertical slice**: its own logic, ports, and orchestration.  
 > No split projects per "layer". Functional cohesion lives within the slice.
@@ -22,15 +22,15 @@ Just functional slices of real business logic, with typed ports and clean bounda
 
 ## 💡 Key Concepts
 
-| Component                | Role                                                                 |
-|--------------------------|----------------------------------------------------------------------|
-| **Use Case (Slice)**     | Self-contained unit: handler, ports, business logic                  |
-| **Input Adapter**        | Accepts external input (HTTP, CLI, etc.), calls port delegate        |
-| **Output Adapter**       | Implements outbound ports (DB, Email, Storage)                       |
-| **Input Port**           | Delegate/function signature invoked by adapter                      |
-| **Output Port**          | Delegate passed into use case to abstract side-effects              |
-| **Core**                 | Pure logic: types, validators, calculators, etc.                     |
-| **App Orchestration**    | Wires ports to logic, defines what happens when and in what order    |
+| Component             | Role                                                              |
+| --------------------- | ----------------------------------------------------------------- |
+| **Use Case (Slice)**  | Self-contained unit: handler, ports, business logic               |
+| **Input Adapter**     | Accepts external input (HTTP, CLI, etc.), calls port delegate     |
+| **Output Adapter**    | Implements outbound ports (DB, Email, Storage)                    |
+| **Handlers**          | Just functions or static orchestrators that implement use-cases   |
+| **Output Port**       | Delegate passed into use case to abstract side-effects            |
+| **Core**              | Pure logic: types, validators, calculators, etc.                  |
+| **App Orchestration** | Wires ports to logic, defines what happens when and in what order |
 
 ---
 
@@ -126,24 +126,3 @@ public delegate Task<Result<Order>> PlaceOrder(CustomerId id, ProductCode code);
 ---
 
 ## 🧪 Sample Code
-
-### 🧩 Use Case Slice: `CreateOrder`
-
-```csharp
-// Input Port
-public delegate Task<Result<OrderCreated>> CreateOrderHandler(CreateOrderCommand cmd);
-
-// Output Port
-public delegate Task<bool> SaveOrder(Order order);
-
-// Application orchestration
-public static CreateOrderHandler CreateOrderUseCase(SaveOrder saveOrder)
-    => async cmd =>
-    {
-        var order = Order.Create(cmd.CustomerId, cmd.Items);
-        var success = await saveOrder(order);
-
-        return success
-            ? Result.Success(new OrderCreated(order.Id))
-            : Result.Failure("Could not save order.");
-    };
