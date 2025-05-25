@@ -13,7 +13,7 @@ Just functional slices of real business logic, with typed ports and clean bounda
 
 ## 📈 Architecture Diagram
 
-![PASTA Architecture Diagram](./assets/PASTA-t-d.png)
+![PASTA Architecture Diagram](./assets/PASTA-dark-trans.png)
 
 > Each use case forms a **vertical slice**: its own logic, ports, and orchestration.  
 > No split projects per "layer". Functional cohesion lives within the slice.
