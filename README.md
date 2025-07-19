@@ -13,7 +13,7 @@ Just functional slices of real business logic, with typed ports and clean bounda
 
 ## 📈 Architecture Diagram
 
-![PASTA Architecture Diagram](./assets/PASTA-dark-trans.png)
+![PASTA Architecture Diagram](./assets/PASTA-arch.png)
 
 > Each use case forms a **vertical slice**: its own logic, ports, and orchestration.  
 > No split projects per "layer". Functional cohesion lives within the slice.
@@ -32,7 +32,7 @@ Just functional slices of real business logic, with typed ports and clean bounda
 | **Core**             | Pure logic: types, validators, calculators, etc.                |
 ---
 
-## ✨ Philosophy
+## 💭 Philosophy
 
 PASTA is an architectural style for modern .NET (and beyond) projects that favors:
 
@@ -46,7 +46,7 @@ PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative 
 
 ---
 
-## 📜 PASTA Manifesto
+## 🪶PASTA Manifesto
 
 > "Layered systems are like overcooked spaghetti — sticky, tangled, and a pain to digest. PASTA serves it al dente."
 
@@ -103,4 +103,32 @@ public delegate Task<Result<Order>> PlaceOrder(CustomerId id, ProductCode code);
 * Service handlers are easy to test with hand-written or inline dependencies.
 ---
 
-## 🧪 Sample Code
+## 🎯 Testing Strategies
+
+| Test Type           | Scope                                    | What to Stub                                         | Purpose                                                    |
+|---------------------|------------------------------------------|------------------------------------------------------|------------------------------------------------------------|
+| **Unit Tests**      | `Core` + optionally `Handlers`           | Everything (Ports, Adapters, I/O)                    | Pure logic, correctness, no side effects                   |
+| **Component Tests** | `Use Case → Handlers → Adapters (owned)` | Only 3rd-party/external adapters (e.g. SMTP, Stripe) | Verify application behavior across multiple layers/modules |
+
+
+## Unit testing
+PASTA enforces unit testing for Core (pure domain logic: rules, validations, calculations)
+and Handlers (if they orchestrate logic without side effects). The goal is to test **individual
+behaviors in isolation and ensure logic correctness unders all conditions**.
+
+It should be fast, deterministic, no I/O
+
+![PASTA Architecture Diagram](./assets/PASTA-unit.png)
+
+## Component testing
+
+PASTA encourages component testing for full use case execution — 
+from API adapter through handlers, core, and owned adapters.
+The goal is to verify the behavior **of a complete vertical slice of the system with real infrastructure components** (e.g. in-memory DB, message broker),
+while **stubbing only external dependencies you don’t own** (e.g. 3rd-party APIs, SMTP).
+It ensures correctness across integrated parts you control, with realistic I/O and boundary behavior.
+
+![PASTA Architecture Diagram](./assets/PASTA-component.png)
+
+---
+## </> Sample Code
