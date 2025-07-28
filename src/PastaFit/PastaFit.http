@@ -1,0 +1,33 @@
+﻿### Get all classes (and their capacity)
+GET http://localhost:5247/classes
+Accept: application/json
+
+###
+
+### Get all members
+GET http://localhost:5247/members
+Accept: application/json
+
+###
+
+# Replace with valid IDs from the /classes call
+# Example GUIDs:
+# classId = f1dfb2c7-d54a-4c97-b5f6-75a6fc02f84e
+# memberId = 5ec2a3e1-d66b-4c39-8c6c-3b6d5a841de1
+
+### Create a new booking
+POST http://localhost:5247/bookings
+Content-Type: application/json
+Accept: application/json
+
+{
+  "memberId": "REPLACE_MEMBER_ID",
+  "classId": "REPLACE_CLASS_ID"
+}
+
+###
+
+### Cancel a booking
+# Replace with a valid booking ID returned from POST /bookings
+DELETE http://localhost:5247/bookings/REPLACE_BOOKING_ID
+Accept: application/json

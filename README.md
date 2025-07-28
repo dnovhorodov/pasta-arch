@@ -91,7 +91,8 @@ PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative 
 * Treat functions as first-class citizens.
 
 ```csharp
-public delegate Task<Result<Order>> PlaceOrder(CustomerId id, ProductCode code);
+public delegate Task SaveBooking(Core.Domain.Booking booking);
+public delegate Task<Result<Booking, BookingError>> GetBooking(Guid bookingId);
 ```
 
 ### 🧪 Test by Design
@@ -132,3 +133,45 @@ It ensures correctness across integrated parts you control, with realistic I/O a
 
 ---
 ## </> Sample Code
+
+### 🥦 PastaFit - Functional Booking System with PASTA (.NET 9)
+
+PastaFit is a sample application demonstrating the PASTA architecture in a real-world fitness domain: a booking system for gym classes.
+It uses:
+- [x] Functional primitives with `FunqTypes.Result<T, E>`
+- [x] No interfaces – just function delegates and records
+- [x] No layers – just Features, Ports, Shell, and Domain
+- [x] Concise and expressive handlers
+- [x] Testability and separation without overengineering
+
+📦 Domain: Booking gym classes
+
+- **Booking** – links a Member to a Class
+- **Class** – has name and limited capacity
+- **Member** – can be active/inactive
+
+### 📈 Architecture
+
+| Layer                 | Responsibility                                       |
+| --------------------- | ---------------------------------------------------- |
+| **Domain**            | Core data types (`Booking`, `Class`, `BookingError`) |
+| **Features**          | Use case logic (e.g. `CreateBookingHandler`)         |
+| **Contracts (Ports)** | Delegates like `GetClass`, `SaveBooking`, etc.       |
+| **Infrastructure**    | In-memory adapters, bootstrapping                    |
+| **Shell**             | Minimal API endpoints and DI glue                    |
+
+
+### ▶️ How to Run
+```shell
+dotnet run --project src/PastaFit
+```
+Then open http://localhost:5247 and use the .http file or run curl commands.
+
+### 📡 API Endpoints
+
+| Method | Route            | Description                 |
+| ------ | ---------------- | --------------------------- |
+| GET    | `/classes`       | List classes + availability |
+| GET    | `/members`       | List all members            |
+| POST   | `/bookings`      | Create booking              |
+| DELETE | `/bookings/{id}` | Cancel booking              |
