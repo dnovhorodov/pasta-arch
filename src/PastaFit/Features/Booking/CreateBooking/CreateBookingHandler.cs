@@ -1,6 +1,6 @@
 ﻿using FunqTypes;
 using PastaFit.Core.Domain;
-using PastaFit.Features.Booking.Contracts;
+using PastaFit.Features.Booking.Ports;
 using static FunqTypes.Result<PastaFit.Core.Domain.Booking, PastaFit.Core.Domain.BookingError>;
 
 namespace PastaFit.Features.Booking.CreateBooking;

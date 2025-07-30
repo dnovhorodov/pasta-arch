@@ -1,7 +1,7 @@
-﻿using PastaFit.Core.Domain;
-using FunqTypes;
+﻿using FunqTypes;
+using PastaFit.Core.Domain;
 
-namespace PastaFit.Features.Booking.Contracts;
+namespace PastaFit.Features.Booking.Ports;
 
 public delegate Task<bool> HasExistingBooking(Guid memberId, Guid classId);
 public delegate Task<bool> IsClassFull(Guid classId);

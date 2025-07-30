@@ -1,12 +1,12 @@
 ﻿using FunqTypes;
 using PastaFit.Core.Domain;
-using PastaFit.Features.Booking.Contracts;
+using PastaFit.Features.Booking.Ports;
 
-namespace PastaFit.Shell.Infrastructure;
+namespace PastaFit.Features.Booking.Adapters;
 
-public static class InMemoryBookingData
+public static class InMemoryBookingAdapter
 {
-    private static readonly List<Booking> Bookings = new();
+    private static readonly List<Core.Domain.Booking> Bookings = new();
     private static readonly Dictionary<Guid, Class> Classes = new();
     private static readonly Dictionary<Guid, Member> Members = new();
 
@@ -62,8 +62,8 @@ public static class InMemoryBookingData
 
         GetBooking: bookingId =>
             Task.FromResult(Bookings.FirstOrDefault(b => b.Id == bookingId) is { } booking
-                ? Result<Booking, BookingError>.Ok(booking)
-                : Result<Booking, BookingError>.Fail(new BookingError.BookingNotFound())),
+                ? Result<Core.Domain.Booking, BookingError>.Ok(booking)
+                : Result<Core.Domain.Booking, BookingError>.Fail(new BookingError.BookingNotFound())),
 
         CancelBooking: bookingId =>
         {

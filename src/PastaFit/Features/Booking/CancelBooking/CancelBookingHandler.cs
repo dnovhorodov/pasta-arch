@@ -1,6 +1,6 @@
 ﻿using FunqTypes;
 using PastaFit.Core.Domain;
-using PastaFit.Features.Booking.Contracts;
+using PastaFit.Features.Booking.Ports;
 
 namespace PastaFit.Features.Booking.CancelBooking;
 

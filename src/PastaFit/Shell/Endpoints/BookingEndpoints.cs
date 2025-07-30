@@ -1,7 +1,7 @@
-﻿using PastaFit.Features.Booking.CancelBooking;
-using PastaFit.Features.Booking.Contracts;
+﻿using PastaFit.Features.Booking.Adapters;
+using PastaFit.Features.Booking.CancelBooking;
+using PastaFit.Features.Booking.Ports;
 using PastaFit.Features.Booking.CreateBooking;
-using PastaFit.Shell.Infrastructure;
 
 namespace PastaFit.Shell.Endpoints;
 
@@ -31,9 +31,9 @@ public static class BookingEndpoints
             );
         });
 
-        app.MapGet("/classes", () => InMemoryBookingData.GetClassAvailability());
+        app.MapGet("/classes", () => InMemoryBookingAdapter.GetClassAvailability());
         
-        app.MapGet("/members", () => InMemoryBookingData.GetAllMembers());
+        app.MapGet("/members", () => InMemoryBookingAdapter.GetAllMembers());
 
 
         return app;

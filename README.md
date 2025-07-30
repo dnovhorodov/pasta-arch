@@ -23,13 +23,16 @@ Just functional slices of real business logic, with typed ports and clean bounda
 ## 💡 Key Concepts
 
 | Component            | Role                                                            |
-| -------------------- | --------------------------------------------------------------- |
+|----------------------|-----------------------------------------------------------------|
 | **Use Case (Slice)** | Self-contained unit: handler, ports, business logic             |
-| **Input Adapter**    | Accepts external input (HTTP, CLI, etc.), calls port delegate   |
-| **Output Adapter**   | Implements outbound ports (DB, Email, Storage)                  |
-| **Handlers**         | Just functions or static orchestrators that implement use-cases |
-| **Output Port**      | Delegate passed into use case to abstract side-effects          |
 | **Core**             | Pure logic: types, validators, calculators, etc.                |
+| **Handlers**         | Just functions or static orchestrators that implement use-cases |
+| **Input Adapter**    | Accepts external input (HTTP, CLI, etc.), calls port delegate   |
+| **Input Port**       | Application use-case, typically handler                         |
+| **Output Port**      | Delegate passed into use case to abstract side-effects          |
+| **Output Adapter**   | Implements outbound ports (DB, Email, Storage)                  |
+
+
 ---
 
 ## 💭 Philosophy
@@ -134,7 +137,7 @@ It ensures correctness across integrated parts you control, with realistic I/O a
 ---
 ## </> Sample Code
 
-### 🥦 PastaFit - Functional Booking System with PASTA (.NET 9)
+### 🏋️‍♂️ PastaFit - Functional Booking System with PASTA (.NET 9)
 
 PastaFit is a sample application demonstrating the PASTA architecture in a real-world fitness domain: a booking system for gym classes.
 It uses:
@@ -144,21 +147,28 @@ It uses:
 - [x] Concise and expressive handlers
 - [x] Testability and separation without overengineering
 
-📦 Domain: Booking gym classes
+### 📦 Domain: Booking gym classes
 
 - **Booking** – links a Member to a Class
 - **Class** – has name and limited capacity
 - **Member** – can be active/inactive
 
+### 🏥 Use Cases
+
+- Book a member into a class (with validation)
+- Cancel a booking
+- View all classes with available capacity
+- View all members
+
 ### 📈 Architecture
 
-| Layer                 | Responsibility                                       |
-| --------------------- | ---------------------------------------------------- |
-| **Domain**            | Core data types (`Booking`, `Class`, `BookingError`) |
-| **Features**          | Use case logic (e.g. `CreateBookingHandler`)         |
-| **Contracts (Ports)** | Delegates like `GetClass`, `SaveBooking`, etc.       |
-| **Infrastructure**    | In-memory adapters, bootstrapping                    |
-| **Shell**             | Minimal API endpoints and DI glue                    |
+| Layer                        | Responsibility                                                 |
+|------------------------------|----------------------------------------------------------------|
+| **Core**                     | Core data types (`Booking`, `Class`, `BookingError`)           |
+| **Features**                 | Use case logic (e.g.`CreateBookingHandler`)                   |
+| **Output Ports (Contracts)** | Delegates like `GetClass`, `SaveBooking`, etc.                 |
+| **Adapters**                 | Real implementation of output ports (`InMemoryBookingAdapter`) |
+| **Shell**                    | Minimal API endpoints and DI glue                              |
 
 
 ### ▶️ How to Run
