@@ -27,23 +27,26 @@ Just functional slices of real business logic, with typed ports and clean bounda
 | **Use Case (Slice)** | Self-contained unit: handler, ports, business logic             |
 | **Core**             | Pure logic: types, validators, calculators, etc.                |
 | **Handlers**         | Just functions or static orchestrators that implement use-cases |
-| **Input Adapter**    | Accepts external input (HTTP, CLI, etc.), calls port delegate   |
-| **Input Port**       | Application use-case, typically handler                         |
-| **Output Port**      | Delegate passed into use case to abstract side-effects          |
-| **Output Adapter**   | Implements outbound ports (DB, Email, Storage)                  |
+| **Output Ports**     | Delegate passed into use case to abstract side-effects          |
+| **Output Adapters**  | Implements outbound ports (DB, Email, Storage)                  |
 
-
+### 💡 Why Input Ports and Adapters Are Omitted
+> In this sample, we intentionally omit explicit Input Ports and Adapters because:
+> - Minimal APIs already serve as the input adapter (receiving and deserializing requests)
+> - The use case handler method (e.g. CreateBookingHandler.Handle) acts as a de facto input port
+> 
+> This approach reduces ceremony while preserving clarity, especially in small to medium vertical slices.
+> You should consider introducing explicit input ports and adapters when you have multiple entry points (e.g. API + CLI + gRPC),
+> need to reuse orchestration logic or have complex input mapping.
 ---
 
 ## 💭 Philosophy
 
 PASTA is an architectural style for modern .NET (and beyond) projects that favors:
 
-* Functionally cohesive, vertically sliced designs
-
-* Delegate-based composition over interface-based ceremony
-
-* Clear separation between core logic and I/O without overengineering
+- Functionally cohesive, vertically sliced designs
+- Delegate-based composition over interface-based ceremony
+- Clear separation between core logic and I/O without overengineering
 
 PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative Shell, and Vertical Slice Architecture, but distills them into a leaner, practical style.
 
@@ -53,58 +56,29 @@ PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative 
 
 > "Layered systems are like overcooked spaghetti — sticky, tangled, and a pain to digest. PASTA serves it al dente."
 
-### ❌ No More Overengineering
+### ✅ Logic Where It Belongs
 
-* Interfaces are not sacred. Use delegates, records, and lambdas instead.
+- Functional core for pure, testable rules.
+- Imperative shell for orchestration and I/O.
+- Use vertical slices — no extra layers, no service soup.
 
-* DI containers should wire up dependencies, not define your architecture.
+### 📦 Ports = Typed Functions
 
-* Fewer layers, more clarity. Logic lives where it belongs.
+- Ports are delegates, not interfaces.
+- Adapters implement them with real infrastructure.
+- Tests use pure functions — no mocks needed.
 
-### ✅ Embrace Simplicity with Power
+### 🧩 Handlers Are Just Functions
 
-* Functional core for business rules — pure, testable, composable.
-
-* Imperative shell for wiring, I/O, and coordination.
-
-* Keep logic close to where it’s used with vertical slices.
-
-### 📦 Ports & Adapters Done Right
-
-* Ports are typed function signatures, not interfaces.
-
-* Adapters are infrastructure implementations of these ports.
-
-* In tests, replace ports with pure functions. No mocking frameworks needed.
-
-### 🧩 Service Handlers: Explicit and Focused
-
-* No base classes, no magic.
-
-* Everything needed is passed via constructor (record positional args).
-
-* Handlers can be composed and reused.
-
-### 🧠 Typed Abstractions Over Interfaces
-
-* Prefer discriminated unions, result types, and domain primitives.
-
-* Abstractions should describe what not how.
-
-* Treat functions as first-class citizens.
-
-```csharp
-public delegate Task SaveBooking(Core.Domain.Booking booking);
-public delegate Task<Result<Booking, BookingError>> GetBooking(Guid bookingId);
-```
+- No base classes. No DI magic.
+- Pass dependencies explicitly — often grouped in records.
+- Composable, readable, focused.
 
 ### 🧪 Test by Design
 
-* No need for mocks when logic is in pure functions.
-
-* Test core logic in isolation.
-
-* Service handlers are easy to test with hand-written or inline dependencies.
+- No need for mocks when logic is in pure functions.
+- Test core logic in isolation.
+- Service handlers are easy to test with hand-written or inline dependencies.
 ---
 
 ## 🎯 Testing Strategies
@@ -167,7 +141,7 @@ It uses:
 | **Core**                     | Core data types (`Booking`, `Class`, `BookingError`)           |
 | **Features**                 | Use case logic (e.g.`CreateBookingHandler`)                   |
 | **Output Ports (Contracts)** | Delegates like `GetClass`, `SaveBooking`, etc.                 |
-| **Adapters**                 | Real implementation of output ports (`InMemoryBookingAdapter`) |
+| **Output Adapters**          | Real implementation of output ports (`InMemoryBookingAdapter`) |
 | **Shell**                    | Minimal API endpoints and DI glue                              |
 
 
