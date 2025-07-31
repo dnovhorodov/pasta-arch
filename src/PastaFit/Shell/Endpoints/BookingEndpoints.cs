@@ -1,6 +1,5 @@
 ﻿using PastaFit.Features.Booking.Adapters;
 using PastaFit.Features.Booking.CancelBooking;
-using PastaFit.Features.Booking.Ports;
 using PastaFit.Features.Booking.CreateBooking;
 
 namespace PastaFit.Shell.Endpoints;
@@ -11,7 +10,7 @@ public static class BookingEndpoints
     {
         app.MapPost("/bookings", async (
             BookingRequest request,
-            BookingDependencies deps) =>
+            CreateBookingDependencies deps) =>
         {
             var result = await CreateBookingHandler.Handle(request.MemberId, request.ClassId, deps);
             return result.Match(
@@ -22,7 +21,7 @@ public static class BookingEndpoints
         
         app.MapDelete("/bookings/{bookingId:guid}", async (
             Guid bookingId,
-            BookingDependencies deps) =>
+            CancelBookingDependencies deps) =>
         {
             var result = await CancelBookingHandler.Handle(bookingId, deps);
             return result.Match(
@@ -34,7 +33,6 @@ public static class BookingEndpoints
         app.MapGet("/classes", () => InMemoryBookingAdapter.GetClassAvailability());
         
         app.MapGet("/members", () => InMemoryBookingAdapter.GetAllMembers());
-
 
         return app;
     }

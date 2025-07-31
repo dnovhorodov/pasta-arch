@@ -7,7 +7,8 @@ public static class DependencyInjection
     public static IServiceCollection AddBookingUseCases(this IServiceCollection services)
     {
         InMemoryBookingAdapter.Bootstrap();
-        services.AddSingleton(InMemoryBookingAdapter.GetBookingDependencies());
+        services.AddSingleton(InMemoryBookingAdapter.GetCreateBookingDependencies());
+        services.AddSingleton(InMemoryBookingAdapter.GetCancelBookingDependencies());
         
         return services;
     }

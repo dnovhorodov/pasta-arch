@@ -1,5 +1,7 @@
 ﻿using FunqTypes;
 using PastaFit.Core.Domain;
+using PastaFit.Features.Booking.CancelBooking;
+using PastaFit.Features.Booking.CreateBooking;
 using PastaFit.Features.Booking.Ports;
 
 namespace PastaFit.Features.Booking.Adapters;
@@ -33,7 +35,7 @@ public static class InMemoryBookingAdapter
         Members[julia.Id] = julia;
     }
 
-    public static BookingDependencies GetBookingDependencies() => new(
+    public static CreateBookingDependencies GetCreateBookingDependencies() => new(
         HasExistingBooking: (memberId, classId) =>
             Task.FromResult(Bookings.Any(b => b.MemberId == memberId && b.ClassId == classId)),
 
@@ -60,11 +62,11 @@ public static class InMemoryBookingAdapter
             return Task.CompletedTask;
         },
 
-        GetBooking: bookingId =>
-            Task.FromResult(Bookings.FirstOrDefault(b => b.Id == bookingId) is { } booking
-                ? Result<Core.Domain.Booking, BookingError>.Ok(booking)
-                : Result<Core.Domain.Booking, BookingError>.Fail(new BookingError.BookingNotFound())),
+        GetBooking: BookingPortFactories.GetBookingPort(Bookings)
+    );
 
+    public static CancelBookingDependencies GetCancelBookingDependencies() => new(
+        GetBooking: BookingPortFactories.GetBookingPort(Bookings),
         CancelBooking: bookingId =>
         {
             Bookings.RemoveAll(b => b.Id == bookingId);
