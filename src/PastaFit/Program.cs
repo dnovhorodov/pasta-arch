@@ -1,6 +1,6 @@
 using Npgsql;
+using PastaFit.Features.Booking;
 using PastaFit.Features.Booking.Adapters;
-using PastaFit.Shell.Endpoints;
 using PastaFit.Shell.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);

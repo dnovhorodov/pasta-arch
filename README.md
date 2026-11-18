@@ -176,16 +176,18 @@ src/PastaFit/
 ├── Features/Booking/
 │   ├── CreateBooking/               # [S] Vertical Slice: Create Booking
 │   │   ├── CreateBookingPorts.cs    # [P] Ports Boundary: Record of narrow Func<> delegates
-│   │   └── CreateBookingHandler.cs  # [A] Anti-Layer Orchestrator: Imperative Shell & Railway pipeline
+│   │   ├── CreateBookingHandler.cs  # [A] Anti-Layer Orchestrator: Imperative Shell & Railway pipeline
+│   │   └── CreateBookingEndpoint.cs # [S] Inbound Minimal API trigger (POST /bookings)
 │   ├── CancelBooking/               # [S] Vertical Slice: Cancel Booking
 │   │   ├── CancelBookingPorts.cs    # [P] Ports Boundary: Record of narrow Func<> delegates
-│   │   └── CancelBookingHandler.cs  # [A] Anti-Layer Orchestrator: Imperative Shell & Railway pipeline
-│   └── Adapters/                    # [A] Outbound Adapters satisfying slice ports
-│       ├── InMemoryBookingAdapter.cs
-│       └── PostgresBookingAdapter.cs
+│   │   ├── CancelBookingHandler.cs  # [A] Anti-Layer Orchestrator: Imperative Shell & Railway pipeline
+│   │   └── CancelBookingEndpoint.cs # [S] Inbound Minimal API trigger (DELETE /bookings/{id})
+│   ├── Adapters/                    # [A] Outbound Adapters satisfying slice ports
+│   │   ├── InMemoryBookingAdapter.cs
+│   │   └── PostgresBookingAdapter.cs
+│   └── BookingFeatureEndpoints.cs   # Feature endpoint registration & error -> HTTP IResult mapping
 └── Shell/
-    ├── Endpoints/BookingEndpoints.cs # [S] Inbound Minimal API triggers (C# 14 extension block)
-    └── Infrastructure/DI.cs          # Composition root wiring Adapters -> Ports
+    └── Infrastructure/DI.cs         # Composition root wiring Adapters -> Ports
 ```
 
 ---
@@ -328,11 +330,12 @@ pasta-arch/
 │   └── PastaFit/
 │       ├── Core/Domain/             # Strongly-typed IDs, records, BookingError & pure BookingPolicy
 │       ├── Features/Booking/
-│       │   ├── CreateBooking/       # CreateBookingHandler & CreateBookingPorts (Func<> record)
-│       │   ├── CancelBooking/       # CancelBookingHandler & CancelBookingPorts (Func<> record)
+│       │   ├── CreateBooking/       # CreateBookingEndpoint, CreateBookingHandler & CreateBookingPorts
+│       │   ├── CancelBooking/       # CancelBookingEndpoint, CancelBookingHandler & CancelBookingPorts
 │       │   ├── Ports/               # BookingQueryPorts (Func<> record)
-│       │   └── Adapters/            # InMemoryBookingAdapter & PostgresBookingAdapter (Dapper/Npgsql)
-│       └── Shell/                   # Minimal API endpoints (BookingEndpoints) & DI composition root
+│       │   ├── Adapters/            # InMemoryBookingAdapter & PostgresBookingAdapter (Dapper/Npgsql)
+│       │   └── BookingFeatureEndpoints.cs
+│       └── Shell/Infrastructure/    # DI composition root wiring Adapters -> Ports
 └── test/
     ├── PastaFit.UnitTests/          # Pure BookingPolicy tests & mock-free handler tests
     ├── PastaFit.ComponentTests/     # Fast in-process HTTP component tests (InMemory adapter)
