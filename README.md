@@ -1,161 +1,394 @@
-![PASTA logo](./assets/pasta_logo_small.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logos/png/full-dark/pasta-option-a-dark-512x512.png" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/logos/png/full-light/pasta-option-a-light-512x512.png" />
+    <img alt="PASTA Architecture Logo" src="assets/logos/png/full-light/pasta-option-a-light-512x512.png" width="240" />
+  </picture>
+</p>
 
-> **PASTA** — _Ports🔹Adapters🔹Slices🔹Typed Abstractions🔹(Anti-Layers)_
+<h3 align="center">
+  <b>P</b>orts 🔹 <b>A</b>dapters 🔹 <b>S</b>lices 🔹 <b>T</b>yped Abstractions 🔹 (<b>A</b>nti-Layers)
+</h3>
 
-A minimalist, modern architecture for building modular, testable, and maintainable systems in C#, with:
-- No interfaces.
-- No anemic layers.
-- No framework-driven indirection.
+<p align="center">
+  <b>A minimalist, functional-first architecture for building modular, testable, and maintainable systems in modern .NET and beyond.</b>
+</p>
 
-Just functional slices of real business logic, with typed ports and clean boundaries.
+<p align="center">
+  <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET%2010-C%23%2014-512BD4?style=flat-square&logo=dotnet" alt=".NET 10 & C# 14" /></a>
+  <a href="https://www.nuget.org/packages/FunqTypes"><img src="https://img.shields.io/badge/ROP-FunqTypes-8BE9FD?style=flat-square" alt="FunqTypes" /></a>
+  <a href="skills/SKILL.md"><img src="https://img.shields.io/badge/AI%20Skill-Included-FF79C6?style=flat-square" alt="AI Agent Skill Included" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-BD93F9?style=flat-square" alt="MIT License" /></a>
+</p>
 
----
-
-## 📈 Architecture Diagram
-
-![PASTA Architecture Diagram](./assets/PASTA-arch.png)
-
-> Each use case forms a **vertical slice**: its own logic, ports, and orchestration.  
-> No split projects per "layer". Functional cohesion lives within the slice.
-
----
-
-## 💡 Key Concepts
-
-| Component            | Role                                                            |
-|----------------------|-----------------------------------------------------------------|
-| **Use Case (Slice)** | Self-contained unit: handler, ports, business logic             |
-| **Core**             | Pure logic: types, validators, calculators, etc.                |
-| **Handlers**         | Just functions or static orchestrators that implement use-cases |
-| **Output Ports**     | Delegate passed into use case to abstract side-effects          |
-| **Output Adapters**  | Implements outbound ports (DB, Email, Storage)                  |
-
-### 💡 Why Input Ports and Adapters Are Omitted
-> In this sample, we intentionally omit explicit Input Ports and Adapters because:
-> - Minimal APIs already serve as the input adapter (receiving and deserializing requests)
-> - The use case handler method (e.g. CreateBookingHandler.Handle) acts as a de facto input port
-> 
-> This approach reduces ceremony while preserving clarity, especially in small to medium vertical slices.
-> You should consider introducing explicit input ports and adapters when you have multiple entry points (e.g. API + CLI + gRPC),
-> need to reuse orchestration logic or have complex input mapping.
----
-
-## 💭 Philosophy
-
-PASTA is an architectural style for modern .NET (and beyond) projects that favors:
-
-- Functionally cohesive, vertically sliced designs
-- Delegate-based composition over interface-based ceremony
-- Clear separation between core logic and I/O without overengineering
-
-PASTA takes inspiration from Hexagonal Architecture, Functional Core/Imperative Shell, and Vertical Slice Architecture, but distills them into a leaner, practical style.
+<p align="center">
+  <a href="#-the-pasta-manifesto">Manifesto</a> •
+  <a href="#-1-overall-architecture">Architecture</a> •
+  <a href="#-2-unit--slice-anatomy">Slice Anatomy</a> •
+  <a href="#-3-testing-strategy--boundaries">Testing Boundaries</a> •
+  <a href="#-4-sample-application-pastafit">Sample App</a> •
+  <a href="#-5-ai-agent-skill">AI Skill</a>
+</p>
 
 ---
 
-## 🪶PASTA Manifesto
+## 🪶 The PASTA Manifesto
 
-> "Layered systems are like overcooked spaghetti — sticky, tangled, and a pain to digest. PASTA serves it al dente."
+> *"Layered systems are like overcooked spaghetti - sticky, tangled, and a pain to digest. **PASTA** serves it al dente."*
 
-### ✅ Logic Where It Belongs
+Traditional enterprise architectures drown simple business problems in ceremony: horizontal project layers, pass-through services, generic repositories, and interface-per-class indirection. **PASTA** distills **Hexagonal Architecture (Ports & Adapters)**, **Functional Core / Imperative Shell (FCIS)**, and **Vertical Slice Architecture** into a lean, pragmatic design:
 
-- Functional core for pure, testable rules.
-- Imperative shell for orchestration and I/O.
-- Use vertical slices — no extra layers, no service soup.
-
-### 📦 Ports = Typed Functions
-
-- Ports are delegates, not interfaces.
-- Adapters implement them with real infrastructure.
-- Tests use pure functions — no mocks needed.
-
-### 🧩 Handlers Are Just Functions
-
-- No base classes. No DI magic.
-- Pass dependencies explicitly — often grouped in records.
-- Composable, readable, focused.
-
-### 🧪 Test by Design
-
-- No need for mocks when logic is in pure functions.
-- Test core logic in isolation.
-- Service handlers are easy to test with hand-written or inline dependencies.
----
-
-## 🎯 Testing Strategies
-
-| Test Type           | Scope                                    | What to Stub                                         | Purpose                                                    |
-|---------------------|------------------------------------------|------------------------------------------------------|------------------------------------------------------------|
-| **Unit Tests**      | `Core` + optionally `Handlers`           | Everything (Ports, Adapters, I/O)                    | Pure logic, correctness, no side effects                   |
-| **Component Tests** | `Use Case → Handlers → Adapters (owned)` | Only 3rd-party/external adapters (e.g. SMTP, Stripe) | Verify application behavior across multiple layers/modules |
-
-
-## Unit testing
-PASTA enforces unit testing for Core (pure domain logic: rules, validations, calculations)
-and Handlers (if they orchestrate logic without side effects). The goal is to test **individual
-behaviors in isolation and ensure logic correctness unders all conditions**.
-
-It should be fast, deterministic, no I/O
-
-![PASTA Architecture Diagram](./assets/PASTA-unit.png)
-
-## Component testing
-
-PASTA encourages component testing for full use case execution — 
-from API adapter through handlers, core, and owned adapters.
-The goal is to verify the behavior **of a complete vertical slice of the system with real infrastructure components** (e.g. in-memory DB, message broker),
-while **stubbing only external dependencies you don’t own** (e.g. 3rd-party APIs, SMTP).
-It ensures correctness across integrated parts you control, with realistic I/O and boundary behavior.
-
-![PASTA Architecture Diagram](./assets/PASTA-component.png)
+- **No service or repository interfaces** - Ports are typed function delegates (`Func<>` / `Action<>`).
+- **No anemic horizontal layers** - Features live in self-contained vertical slices.
+- **No domain exceptions for control flow** - Predictable outcomes flow through Railway-Oriented Programming (`Result<T, E>`, `Option<T>`).
+- **No heavy mocking frameworks** - Pure functions and delegate ports make testing trivial with inline lambdas.
 
 ---
-## </> Sample Code
 
-### 🏋️‍♂️ PastaFit - Functional Booking System with PASTA (.NET 9)
+## 🏛️ 1. Overall Architecture
 
-PastaFit is a sample application demonstrating the PASTA architecture in a real-world fitness domain: a booking system for gym classes.
-It uses:
-- [x] Functional primitives with `FunqTypes.Result<T, E>`
-- [x] No interfaces – just function delegates and records
-- [x] No layers – just Features, Ports, Shell, and Domain
-- [x] Concise and expressive handlers
-- [x] Testability and separation without overengineering
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/images/pasta_arch_dark.jpg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/images/pasta_arch_light.jpg" />
+    <img alt="PASTA Architecture Overview" src="assets/images/pasta_arch_light.jpg" width="100%" />
+  </picture>
+</p>
 
-### 📦 Domain: Booking gym classes
+### The 5 Pillars of PASTA
 
-- **Booking** – links a Member to a Class
-- **Class** – has name and limited capacity
-- **Member** – can be active/inactive
+| Pillar | Principle | What It Means in Practice |
+| :--- | :--- | :--- |
+| **P - Ports** | **Narrow Function Signatures** | Outbound I/O capabilities are modeled as single-purpose delegates or `Func<>`/`Action<>` records - never bloated `IRepository<T>` or `IFooService` interfaces. |
+| **A - Adapters** | **Infrastructure at the Edges** | Concrete infrastructure bindings (PostgreSQL, Redis, RabbitMQ/Kafka, external HTTP APIs) live at the outer edges and satisfy Port signatures. |
+| **S - Slices** | **Vertical Feature Isolation** | Code is organized vertically by business capability (`CreateOrder`, `CancelBooking`) rather than split horizontally across `Controllers/`, `Services/`, and `Repositories/`. Zero cross-slice coupling. |
+| **T - Typed Abstractions** | **Deep Domain Type Safety** | Eliminates primitive obsession using immutable `record` types, zero-allocation strongly-typed IDs (`readonly record struct`), and algebraic types (`Result<T, E>`, `Option<T>` via [`FunqTypes`](https://www.nuget.org/packages/FunqTypes)). |
+| **A - Anti-Layers** | **Zero Pass-Through Ceremony** | Eliminates artificial `Controller → Service → Manager → Repository → DAO` chains. Inbound triggers invoke the slice orchestrator directly. |
 
-### 🏥 Use Cases
+### Anti-Layers & Port Isolation
 
-- Book a member into a class (with validation)
-- Cancel a booking
-- View all classes with available capacity
-- View all members
+1. **Top Edge (Inbound Adapters):** Web UI, Minimal APIs, CLI commands, message consumers, and background jobs act as entry triggers that deserialize requests and invoke the slice.
+2. **Inside (The Slice Core):**
+   - **Typed Abstractions** validate and represent the domain state and inputs/outputs.
+   - **Use Cases & Domain Logic** execute pure business rules with **zero database or I/O access**.
+   - **Outgoing Ports** define the exact delegate signatures required to load or persist state.
+3. **Bottom Edge (Infrastructure Adapters):** Real databases, caches, message brokers, and third-party APIs implement the outgoing delegates at the boundary.
 
-### 📈 Architecture
+> [!NOTE]
+> **Why Explicit Input Ports Are Optional:** In modern .NET, Minimal APIs and message handlers already serve as lightweight inbound adapters, while the slice handler method (`CreateBookingHandler.Handle`) acts as the de facto input port. Introduce explicit input ports only when multiple transport triggers (e.g., HTTP + gRPC + CLI) share complex input mapping.
 
-| Layer                        | Responsibility                                                 |
-|------------------------------|----------------------------------------------------------------|
-| **Core**                     | Core data types (`Booking`, `Class`, `BookingError`)           |
-| **Features**                 | Use case logic (e.g.`CreateBookingHandler`)                   |
-| **Output Ports (Contracts)** | Delegates like `GetClass`, `SaveBooking`, etc.                 |
-| **Output Adapters**          | Real implementation of output ports (`InMemoryBookingAdapter`) |
-| **Shell**                    | Minimal API endpoints and DI glue                              |
+---
 
+## 🧬 2. Unit & Slice Anatomy
 
-### ▶️ How to Run
-```shell
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/images/pasta_unit_slice_dark.jpg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/images/pasta_unit_slice_light.jpg" />
+    <img alt="PASTA Unit and Slice Anatomy" src="assets/images/pasta_unit_slice_light.jpg" width="100%" />
+  </picture>
+</p>
+
+Each feature forms an **isolated vertical slice** partitioned using **Functional Core, Imperative Shell (FCIS)** and connected via a linear **Railway-Oriented Programming (ROP)** pipeline:
+
+### 1. Inbound Triggers (The Outer Edge)
+- **Web API / Minimal API**, **CLI / Queue Consumers**, or **Background Jobs** receive raw external input and pass an **Input Command / Request DTO** through the entry gate into the slice boundary.
+
+### 2. Feature Slice Center (`CreateOrder` / `CreateBooking`)
+Inside the dashed slice boundary, **zero direct database or I/O dependencies exist**:
+- **Input Validation & Typed Abstractions:** Raw inputs are parsed and validated into strongly-typed domain primitives, value objects, and discriminated unions.
+  - 🔴 **Invalid Input:** Short-circuits immediately with an early typed `Result.Fail(Error)` return.
+  - 🟢 **Valid Input:** Continues along the success track to execute domain logic.
+- **Feature Handler / Orchestrator (Imperative Shell):** Coordinates the workflow - loading state through ports, invoking the pure domain policy, and committing side effects through ports using monadic composition (`.Bind`, `.BindAsync`, `.Map`).
+- **Pure Domain Policy (Functional Core):** Contains state transitions, invariant checks, and business calculations. Strictly **synchronous, deterministic, no async, no I/O, and no exceptions**.
+
+### 3. Ports & Delegates Boundary (Bottom of Slice)
+- Instead of injecting broad interfaces, the slice declares narrow, explicit `Func<>` delegate requirements inside a `record`:
+  ```csharp
+  public sealed record CreateBookingPorts(
+      Func<MemberId, CancellationToken, ValueTask<Option<Member>>> GetMember,
+      Func<ClassId, CancellationToken, ValueTask<Option<Class>>> GetClass,
+      Func<ClassId, CancellationToken, ValueTask<int>> CountClassBookings,
+      Func<MemberId, ClassId, CancellationToken, ValueTask<bool>> HasExistingBooking,
+      Func<Booking, CancellationToken, ValueTask<Result<Unit, BookingError>>> SaveBooking
+  );
+  ```
+
+### 4. Pure Domain Policy + Railway Handler in Action
+- **Pure Domain Core (`BookingPolicy.cs`)** - Synchronous, deterministic, zero I/O, using `Result.Combine` from `FunqTypes` to accumulate all rule violations at once:
+  ```csharp
+  public static Result<Booking, BookingError> Create(
+      Member member, Class gymClass, int activeBookingsCount, bool hasExistingBooking, DateTimeOffset nowUtc)
+  {
+      var memberActiveCheck = member.IsActive
+          ? Result<Unit, BookingError>.Ok(Unit.Value)
+          : Result<Unit, BookingError>.Fail(new BookingError.MemberInactive());
+
+      var notAlreadyBookedCheck = !hasExistingBooking
+          ? Result<Unit, BookingError>.Ok(Unit.Value)
+          : Result<Unit, BookingError>.Fail(new BookingError.AlreadyBooked());
+
+      var capacityCheck = activeBookingsCount < gymClass.Capacity
+          ? Result<Unit, BookingError>.Ok(Unit.Value)
+          : Result<Unit, BookingError>.Fail(new BookingError.ClassFull());
+
+      return Result.Combine(memberActiveCheck, notAlreadyBookedCheck, capacityCheck)
+          .Map((_, _, _) => new Booking(BookingId.New(), member.Id, gymClass.Id, nowUtc));
+  }
+  ```
+- **Imperative Shell Orchestrator (`CreateBookingHandler.cs`)** - Composes input validation, port lookups, pure policy evaluation, and persistence on a single railway track:
+  ```csharp
+  public static async Task<Result<Booking, BookingError>> Handle(
+      CreateBookingCommand command, CreateBookingPorts ports, TimeProvider timeProvider, CancellationToken ct = default)
+  {
+      return await Result.Combine(MemberId.From(command.MemberId), ClassId.From(command.ClassId))
+          .BindAsync(async (memberId, classId) =>
+          {
+              var memberResult = (await ports.GetMember(memberId, ct)).ToResult<BookingError>(new BookingError.MemberNotFound());
+              var classResult = (await ports.GetClass(classId, ct)).ToResult<BookingError>(new BookingError.ClassNotFound());
+
+              return await Result.Combine(memberResult, classResult)
+                  .BindAsync(async (member, gymClass) =>
+                  {
+                      var activeCount = await ports.CountClassBookings(classId, ct);
+                      var alreadyBooked = await ports.HasExistingBooking(memberId, classId, ct);
+                      return BookingPolicy.Create(member, gymClass, activeCount, alreadyBooked, timeProvider.GetUtcNow());
+                  });
+          })
+          .BindAsync(async booking => (await ports.SaveBooking(booking, ct)).Map(_ => booking));
+  }
+  ```
+
+### 5. Infrastructure Adapters (Bottom Edge)
+- Concrete adapters (**PostgreSQL**, **EventStoreDB**, **Redis**, **RabbitMQ/Kafka**, **HTTP Clients**) provide functions matching the port delegates and are wired up at the application composition root.
+
+### Canonical Slice Folder Structure (`PastaFit`)
+
+```text
+src/PastaFit/
+├── Core/Domain/
+│   ├── Identifiers.cs               # [T] Strongly-typed IDs (BookingId, MemberId, ClassId)
+│   ├── Booking.cs / Class.cs        # [T] Immutable domain records
+│   ├── BookingError.cs              # [T] Closed error hierarchy
+│   └── BookingPolicy.cs             # [T] Pure Domain Core: Synchronous rules & Result.Combine
+├── Features/Booking/
+│   ├── CreateBooking/               # [S] Vertical Slice: Create Booking
+│   │   ├── CreateBookingPorts.cs    # [P] Ports Boundary: Record of narrow Func<> delegates
+│   │   └── CreateBookingHandler.cs  # [A] Anti-Layer Orchestrator: Imperative Shell & Railway pipeline
+│   ├── CancelBooking/               # [S] Vertical Slice: Cancel Booking
+│   │   ├── CancelBookingPorts.cs    # [P] Ports Boundary: Record of narrow Func<> delegates
+│   │   └── CancelBookingHandler.cs  # [A] Anti-Layer Orchestrator: Imperative Shell & Railway pipeline
+│   └── Adapters/                    # [A] Outbound Adapters satisfying slice ports
+│       ├── InMemoryBookingAdapter.cs
+│       └── PostgresBookingAdapter.cs
+└── Shell/
+    ├── Endpoints/BookingEndpoints.cs # [S] Inbound Minimal API triggers (C# 14 extension block)
+    └── Infrastructure/DI.cs          # Composition root wiring Adapters -> Ports
+```
+
+---
+
+## 🧪 3. Testing Strategy & Boundaries
+
+Because PASTA isolates pure business rules from I/O and replaces multi-method interfaces with simple delegates, testing becomes fast, deterministic, and completely free of mocking framework ceremony.
+
+| Test Level | Scope | What Is Stubbed | Speed & Characteristics |
+| :--- | :--- | :--- | :--- |
+| **Unit Tests** | `Validation + Handler + Pure Domain Policy + Port Delegates` | Outgoing Port delegates (via inline lambdas) | ⚡ **Instant (In-Memory, Zero I/O)** - Tests all domain logic, state transitions, and handler branching. |
+| **Component Tests** | `Triggering Adapter (HTTP) → Slice → Outgoing Ports` | Only the Infrastructure Adapter implementation (in-memory/fake) | 🚀 **Fast (In-Process HTTP)** - Verifies routing, serialization, validation (`400`), and full slice orchestration. |
+| **E2E / Integration Tests** | `Full Pipeline + Real Infrastructure Adapters` | Only unowned 3rd-party external systems | 🐳 **Realistic (Docker / Testcontainers)** - Verifies SQL queries, network boundaries, and real infrastructure. |
+
+---
+
+### 🔬 3.1 Unit Testing Boundaries
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/images/pasta_unit_testing_dark.jpg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/images/pasta_unit_testing_light.jpg" />
+    <img alt="PASTA Unit Testing Boundaries" src="assets/images/pasta_unit_testing_light.jpg" width="100%" />
+  </picture>
+</p>
+
+Unit tests target everything **inside the green boundary** by sending an **Entry Command / Request DTO** directly into the slice:
+
+- **Input Validation & Typed Abstractions:** Assert parsing rules, value constraints, and error union outcomes.
+- **Feature Handler / Orchestrator:** Assert workflow sequencing, railway short-circuiting, and success/error branch handling.
+- **Pure Domain Policy:** Exhaustively test edge cases, business math, and state machines synchronously with zero setup.
+- **Delegates & Outgoing Ports (Zero Mocking Frameworks):** Instead of `Moq` or `NSubstitute`, pass one-line lambda expressions directly into the port record:
+
+```csharp
+[Fact]
+public async Task Fails_If_Class_Is_Full()
+{
+    var ports = new CreateBookingPorts(
+        GetMember: (id, _) => ValueTask.FromResult(Option<Member>.Some(new Member(id, "Alice", true))),
+        GetClass: (id, _) => ValueTask.FromResult(Option<Class>.Some(new Class(id, "Yoga", 5))),
+        CountClassBookings: (_, _) => ValueTask.FromResult(5), // <-- Inline lambda stub: class at capacity!
+        HasExistingBooking: (_, _, _) => ValueTask.FromResult(false),
+        SaveBooking: (_, _) => ValueTask.FromResult(Result<Unit, BookingError>.Ok(Unit.Value))
+    );
+
+    var result = await CreateBookingHandler.Handle(
+        new CreateBookingCommand(Guid.NewGuid(), Guid.NewGuid()),
+        ports,
+        TimeProvider.System);
+
+    Assert.False(result.IsSuccess);
+    Assert.Contains(result.Errors, e => e is BookingError.ClassFull);
+}
+```
+
+> **Out of Scope for Unit Tests:** Inbound HTTP/CLI triggers and external infrastructure adapters (PostgreSQL, Redis, brokers) sit outside the unit boundary and are covered by Component and E2E tests.
+
+---
+
+### 🌐 3.2 Component & E2E Testing Boundaries
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/images/pasta_component_e2e_testing_dark.jpg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/images/pasta_component_e2e_testing_light.jpg" />
+    <img alt="PASTA Component and E2E Testing Boundaries" src="assets/images/pasta_component_e2e_testing_light.jpg" width="100%" />
+  </picture>
+</p>
+
+Across the linear, unidirectional pipeline, PASTA distinguishes between **In-Process Component Tests** and **Full E2E / Integration Tests**:
+
+#### 🟦 Component Test Boundary (In-Process / Fast)
+- Exercises the slice from the **Triggering Adapter** (`WebApplicationFactory<Program>` HTTP client) through **Input Parsing & Validation**, **Feature Handler**, **Core Domain**, and **Outgoing Ports**, backed by lightweight in-memory or fake adapters.
+- Verifies that invalid inputs map to `400 Bad Request`, domain errors map to proper HTTP problem responses, and DI wiring works end-to-end - all in milliseconds without spinning up external servers.
+
+```csharp
+[Fact]
+public async Task Can_Book_Detect_Conflict_And_Cancel_Class()
+{
+    var members = await _client.GetFromJsonAsync<List<Member>>("/members");
+    var classes = await _client.GetFromJsonAsync<List<ClassAvailability>>("/classes");
+
+    var req = new { memberId = members!.First(m => m.IsActive).Id.Value, classId = classes!.First().Id };
+
+    var bookResp = await _client.PostAsJsonAsync("/bookings", req);
+    Assert.Equal(HttpStatusCode.Created, bookResp.StatusCode);
+
+    var duplicateResp = await _client.PostAsJsonAsync("/bookings", req);
+    Assert.Equal(HttpStatusCode.Conflict, duplicateResp.StatusCode);
+
+    var booking = await bookResp.Content.ReadFromJsonAsync<Booking>();
+    var cancelResp = await _client.DeleteAsync($"/bookings/{booking!.Id.Value}");
+    Assert.Equal(HttpStatusCode.NoContent, cancelResp.StatusCode);
+}
+```
+
+#### 🟪 E2E / Integration Test Boundary (Network & Container Level)
+- Extends the boundary to include real **Infrastructure Adapters** (PostgreSQL, EventStoreDB, Redis, RabbitMQ/Kafka, HTTP Clients) running in Docker or **Testcontainers**.
+- Validates real database queries, schema initialization, serialization, and network resilience across the complete deployed topology-while **zero lines of Domain, Handler, Port, or Endpoint code change**:
+
+```csharp
+public sealed class BookingPostgresE2ETests : IAsyncLifetime
+{
+    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
+        .WithImage("postgres:17-alpine")
+        .Build();
+
+    // Injects the Testcontainers PostgreSQL connection string into WebApplicationFactory<Program>,
+    // automatically switching DI from InMemoryBookingAdapter to PostgresBookingAdapter!
+}
+```
+
+---
+
+## 🏋️‍♂️ 4. Sample Application: PastaFit
+
+`src/PastaFit` is a reference .NET application demonstrating **PASTA Architecture** in a fitness class booking domain.
+
+### Domain & Capabilities
+- **Typed Abstractions & Pure Core (`Core/Domain`):**
+  - Strongly-typed IDs (`BookingId`, `MemberId`, `ClassId`) with validation returning `Result<TId, BookingError>`.
+  - Domain records (`Booking`, `Class`, `Member`) and closed error hierarchy `BookingError` (`InvalidInput`, `MemberNotFound`, `MemberInactive`, `AlreadyBooked`, `ClassFull`, `ClassNotFound`, `BookingNotFound`).
+  - **`BookingPolicy` (Pure Functional Core):** Synchronous, deterministic invariant validation using `FunqTypes` `Result.Combine(...)` to accumulate all violated domain rules at once.
+- **Use Cases & Adapters (`Features/Booking`):**
+  - `CreateBookingHandler` & `CreateBookingPorts` (`Func<..., CancellationToken, ValueTask<...>>` record)
+  - `CancelBookingHandler` & `CancelBookingPorts`
+  - **Dual Adapters (Zero Core/Handler Changes):** `InMemoryBookingAdapter` (default for local dev & fast Component Tests) and `PostgresBookingAdapter` (Dapper + Npgsql for production & Testcontainers E2E Tests).
+
+### Project Structure
+
+```text
+pasta-arch/
+├── assets/                          # Dark & light architecture diagrams and logos
+├── skills/
+│   └── SKILL.md                     # AI Coding Agent Skill for PASTA Architecture (.NET 10+)
+├── src/
+│   └── PastaFit/
+│       ├── Core/Domain/             # Strongly-typed IDs, records, BookingError & pure BookingPolicy
+│       ├── Features/Booking/
+│       │   ├── CreateBooking/       # CreateBookingHandler & CreateBookingPorts (Func<> record)
+│       │   ├── CancelBooking/       # CancelBookingHandler & CancelBookingPorts (Func<> record)
+│       │   ├── Ports/               # BookingQueryPorts (Func<> record)
+│       │   └── Adapters/            # InMemoryBookingAdapter & PostgresBookingAdapter (Dapper/Npgsql)
+│       └── Shell/                   # Minimal API endpoints (BookingEndpoints) & DI composition root
+└── test/
+    ├── PastaFit.UnitTests/          # Pure BookingPolicy tests & mock-free handler tests
+    ├── PastaFit.ComponentTests/     # Fast in-process HTTP component tests (InMemory adapter)
+    └── PastaFit.E2ETests/           # Full E2E tests with real PostgreSQL via Testcontainers
+```
+
+### Quick Start
+
+#### Option A: Run with In-Memory Adapter (Zero Dependencies)
+```bash
 dotnet run --project src/PastaFit
 ```
-Then open http://localhost:5247 and use the .http file or run curl commands.
 
-### 📡 API Endpoints
+#### Option B: Run with Real PostgreSQL Adapter (Docker)
+```bash
+docker run -d --name pastafit-db -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:17-alpine
 
-| Method | Route            | Description                 |
-| ------ | ---------------- | --------------------------- |
-| GET    | `/classes`       | List classes + availability |
-| GET    | `/members`       | List all members            |
-| POST   | `/bookings`      | Create booking              |
-| DELETE | `/bookings/{id}` | Cancel booking              |
+ConnectionStrings__Postgres="Host=localhost;Database=postgres;Username=postgres;Password=postgres" \
+  dotnet run --project src/PastaFit
+```
+
+#### Run the 3-Tier Test Suite
+```bash
+# 1. Fast Unit Tests (Pure Core & Mock-Free Handlers - ~30ms, no Docker needed)
+dotnet test test/PastaFit.UnitTests
+
+# 2. Fast Component Tests (In-Process HTTP via WebApplicationFactory - ~400ms, no Docker needed)
+dotnet test test/PastaFit.ComponentTests
+
+# 3. Full E2E Tests (Spins up PostgreSQL via Testcontainers - requires Docker)
+dotnet test test/PastaFit.E2ETests
+```
+
+### 📡 Interactive API Requests ([`PastaFit.http`](src/PastaFit/PastaFit.http))
+
+Once running on `http://localhost:5247`, open **[`src/PastaFit/PastaFit.http`](src/PastaFit/PastaFit.http)** in Rider, Visual Studio, or VS Code (REST Client) to execute pre-configured requests with seeded IDs out of the box:
+
+| Method | Route | Scenario Covered in `PastaFit.http` |
+| :--- | :--- | :--- |
+| `GET` | `/classes` | List all gym classes (`Yoga`, `Spin`) and real-time available capacity |
+| `GET` | `/members` | List all seeded members (`Alice` active, `Bob` inactive, etc.) |
+| `POST` | `/bookings` | `201 Created` (valid), `409 Conflict` (duplicate), `422` (inactive member), `400` (accumulated validation errors) |
+| `DELETE` | `/bookings/{id}` | `204 No Content` - automatically chains `@bookingId` from the `POST` response |
+
+---
+
+## 🤖 5. AI Agent Skill
+
+Want your AI coding assistant (Claude Code, Antigravity, Cursor, GitHub Copilot, Windsurf) to write idiomatic **PASTA Architecture** code out of the box?
+
+This repository includes a ready-to-use, comprehensive AI Skill at **[`skills/SKILL.md`](skills/SKILL.md)** covering:
+- **P.A.S.T.A.** architectural constraints and anti-layer rules
+- **Functional Core, Imperative Shell (FCIS)** partitioning
+- Granular `Func<>` / `Action<>` port records returning `ValueTask`
+- Railway-Oriented Programming pipelines with **`FunqTypes`** (`.Bind`, `.BindAsync`, `.Map`, `.Match`)
+- Zero-allocation strongly-typed IDs (`readonly record struct`) and mock-free testing blueprints
+
+Copy [`skills/SKILL.md`](skills/SKILL.md) into your project's skills or rules directory to enforce PASTA standards automatically.
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for full details.

@@ -9,12 +9,12 @@ public class CancelBookingHandlerTests
     [Fact]
     public async Task Fails_If_Booking_Not_Found()
     {
-        var deps = new CancelBookingDependencies(
-            GetBooking: _ => Task.FromResult(Result<Booking, BookingError>.Fail(new BookingError.BookingNotFound())),
-            CancelBooking: _ => Task.CompletedTask
+        var ports = new CancelBookingPorts(
+            GetBooking: (_, _) => ValueTask.FromResult(Option<Booking>.None()),
+            DeleteBooking: (_, _) => ValueTask.FromResult(Result<Unit, BookingError>.Ok(Unit.Value))
         );
 
-        var result = await CancelBookingHandler.Handle(Guid.NewGuid(), deps);
+        var result = await CancelBookingHandler.Handle(Guid.NewGuid(), ports);
 
         Assert.False(result.IsSuccess);
         Assert.Contains(result.Errors, e => e is BookingError.BookingNotFound);
@@ -23,24 +23,23 @@ public class CancelBookingHandlerTests
     [Fact]
     public async Task Succeeds_When_Booking_Exists()
     {
-        var bookingId = Guid.NewGuid();
-        var booking = new Booking(bookingId, Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow);
+        var bookingId = BookingId.New();
+        var booking = new Booking(bookingId, MemberId.New(), ClassId.New(), DateTimeOffset.UtcNow);
+        var wasDeleted = false;
 
-        var wasCancelled = false;
-
-        var deps = new CancelBookingDependencies(
-            GetBooking: _ => Task.FromResult(Result<Booking, BookingError>.Ok(booking)),
-            CancelBooking: id =>
+        var ports = new CancelBookingPorts(
+            GetBooking: (_, _) => ValueTask.FromResult(Option<Booking>.Some(booking)),
+            DeleteBooking: (_, _) =>
             {
-                wasCancelled = true;
-                return Task.CompletedTask;
+                wasDeleted = true;
+                return ValueTask.FromResult(Result<Unit, BookingError>.Ok(Unit.Value));
             }
         );
 
-        var result = await CancelBookingHandler.Handle(bookingId, deps);
+        var result = await CancelBookingHandler.Handle(bookingId.Value, ports);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(bookingId, result.Value.Id);
-        Assert.True(wasCancelled);
+        Assert.True(wasDeleted);
     }
 }

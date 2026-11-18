@@ -1,40 +1,67 @@
-﻿using PastaFit.Features.Booking.Adapters;
+﻿using PastaFit.Core.Domain;
 using PastaFit.Features.Booking.CancelBooking;
 using PastaFit.Features.Booking.CreateBooking;
+using PastaFit.Features.Booking.Ports;
 
 namespace PastaFit.Shell.Endpoints;
 
 public static class BookingEndpoints
 {
-    public static IEndpointRouteBuilder MapBookingEndpoints(this IEndpointRouteBuilder app)
+    extension(IEndpointRouteBuilder app)
     {
-        app.MapPost("/bookings", async (
-            BookingRequest request,
-            CreateBookingDependencies deps) =>
+        public IEndpointRouteBuilder MapBookingEndpoints()
         {
-            var result = await CreateBookingHandler.Handle(request.MemberId, request.ClassId, deps);
-            return result.Match(
-                booking => Results.Created($"/bookings/{booking.Id}", booking),
-                errors => Results.BadRequest(errors)
-            );
-        });
-        
-        app.MapDelete("/bookings/{bookingId:guid}", async (
-            Guid bookingId,
-            CancelBookingDependencies deps) =>
-        {
-            var result = await CancelBookingHandler.Handle(bookingId, deps);
-            return result.Match(
-                _ => Results.NoContent(),
-                errors => Results.NotFound(errors)
-            );
-        });
+            app.MapPost("/bookings", async (
+                BookingRequest request,
+                CreateBookingPorts ports,
+                TimeProvider timeProvider,
+                CancellationToken ct) =>
+            {
+                var result = await CreateBookingHandler.Handle(
+                    new CreateBookingCommand(request.MemberId, request.ClassId),
+                    ports,
+                    timeProvider,
+                    ct);
 
-        app.MapGet("/classes", () => InMemoryBookingAdapter.GetClassAvailability());
-        
-        app.MapGet("/members", () => InMemoryBookingAdapter.GetAllMembers());
+                return result.Match(
+                    booking => Results.Created($"/bookings/{booking.Id.Value}", booking),
+                    errors => errors.ToHttpResult()
+                );
+            });
 
-        return app;
+            app.MapDelete("/bookings/{bookingId:guid}", async (
+                Guid bookingId,
+                CancelBookingPorts ports,
+                CancellationToken ct) =>
+            {
+                var result = await CancelBookingHandler.Handle(bookingId, ports, ct);
+                return result.Match(
+                    _ => Results.NoContent(),
+                    errors => errors.ToHttpResult()
+                );
+            });
+
+            app.MapGet("/classes", async (BookingQueryPorts queryPorts, CancellationToken ct) =>
+                Results.Ok(await queryPorts.GetClassAvailability(ct)));
+
+            app.MapGet("/members", async (BookingQueryPorts queryPorts, CancellationToken ct) =>
+                Results.Ok(await queryPorts.GetAllMembers(ct)));
+
+            return app;
+        }
+    }
+
+    extension(IReadOnlyList<BookingError> errors)
+    {
+        private IResult ToHttpResult() =>
+            errors[0] switch
+            {
+                BookingError.InvalidInput => Results.BadRequest(errors),
+                BookingError.MemberNotFound or BookingError.ClassNotFound or BookingError.BookingNotFound => Results.NotFound(errors),
+                BookingError.ClassFull or BookingError.AlreadyBooked => Results.Conflict(errors),
+                BookingError.MemberInactive => Results.UnprocessableEntity(errors),
+                _ => Results.BadRequest(errors)
+            };
     }
 }
 

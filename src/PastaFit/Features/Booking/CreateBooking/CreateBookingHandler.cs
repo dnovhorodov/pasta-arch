@@ -1,36 +1,47 @@
 ﻿using FunqTypes;
 using PastaFit.Core.Domain;
-using static FunqTypes.Result<PastaFit.Core.Domain.Booking, PastaFit.Core.Domain.BookingError>;
 
 namespace PastaFit.Features.Booking.CreateBooking;
+
+public sealed record CreateBookingCommand(Guid MemberId, Guid ClassId);
 
 public static class CreateBookingHandler
 {
     public static async Task<Result<Core.Domain.Booking, BookingError>> Handle(
-        Guid memberId,
-        Guid classId,
-        CreateBookingDependencies deps)
+        CreateBookingCommand command,
+        CreateBookingPorts ports,
+        TimeProvider timeProvider,
+        CancellationToken ct = default)
     {
-        var memberResult = await deps.GetMember(memberId);
-        if (!memberResult.IsSuccess)
-            return Fail(memberResult.Errors.ToArray());
+        // 1. Validate & parse raw inputs into Typed Abstractions (accumulating any errors via Result.Combine)
+        var inputResult = Result.Combine(
+            MemberId.From(command.MemberId),
+            ClassId.From(command.ClassId));
 
-        if (!memberResult.Value.IsActive)
-            return Fail(new BookingError.MemberInactive());
+        // 2. Railway pipeline: Load state via Ports -> Pure Domain Policy -> Save via Port
+        return await inputResult
+            .BindAsync(async (memberId, classId) =>
+            {
+                var memberResult = (await ports.GetMember(memberId, ct))
+                    .ToResult<BookingError>(new BookingError.MemberNotFound());
+                var classResult = (await ports.GetClass(classId, ct))
+                    .ToResult<BookingError>(new BookingError.ClassNotFound());
 
-        var classResult = await deps.GetClass(classId);
-        if (!classResult.IsSuccess)
-            return Fail(classResult.Errors.ToArray());
+                return await Result.Combine(memberResult, classResult)
+                    .BindAsync(async (member, gymClass) =>
+                    {
+                        var activeCount = await ports.CountClassBookings(classId, ct);
+                        var alreadyBooked = await ports.HasExistingBooking(memberId, classId, ct);
 
-        if (await deps.HasExistingBooking(memberId, classId))
-            return Fail(new BookingError.AlreadyBooked());
-
-        if (await deps.IsClassFull(classId))
-            return Fail(new BookingError.ClassFull());
-
-        var booking = new Core.Domain.Booking(Guid.NewGuid(), memberId, classId, DateTime.UtcNow);
-        await deps.SaveBooking(booking);
-
-        return booking;
+                        return BookingPolicy.Create(
+                            member,
+                            gymClass,
+                            activeCount,
+                            alreadyBooked,
+                            timeProvider.GetUtcNow());
+                    });
+            })
+            .BindAsync(async booking =>
+                (await ports.SaveBooking(booking, ct)).Map(_ => booking));
     }
 }

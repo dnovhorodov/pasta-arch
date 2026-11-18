@@ -1,3 +1,3 @@
 ﻿namespace PastaFit.Core.Domain;
 
-public sealed record Member(Guid Id, string Name, bool IsActive);
+public sealed record Member(MemberId Id, string Name, bool IsActive);
