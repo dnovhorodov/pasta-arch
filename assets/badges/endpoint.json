@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "label": "architecture",
+  "message": "PASTA",
+  "color": "BD93F9",
+  "labelColor": "282A36",
+  "logoSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><defs><linearGradient id=\"g\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#FF79C6\"/><stop offset=\"50%\" stop-color=\"#BD93F9\"/><stop offset=\"100%\" stop-color=\"#8BE9FD\"/></linearGradient></defs><path fill=\"url(#g)\" d=\"M7 3h11a9 9 0 0 1 0 18h-5v6l-6 3V3zm6 5v8h5a4 4 0 0 0 0-8h-5z\"/></svg>"
+}

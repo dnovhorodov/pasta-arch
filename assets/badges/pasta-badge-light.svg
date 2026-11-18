@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="188" height="28" viewBox="0 0 188 28" role="img" aria-label="Architecture: PASTA">
+  <title>Architecture: PASTA</title>
+  <defs>
+    <linearGradient id="pastaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF79C6"/>
+      <stop offset="50%" stop-color="#BD93F9"/>
+      <stop offset="100%" stop-color="#8BE9FD"/>
+    </linearGradient>
+    <linearGradient id="pastaPillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333EA"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <clipPath id="badgeClip">
+      <rect width="188" height="28" rx="6"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#badgeClip)">
+    <rect width="124" height="28" fill="#F8FAFC"/>
+    <rect x="124" width="64" height="28" fill="url(#pastaPillGrad)"/>
+  </g>
+  <rect x="0.75" y="0.75" width="186.5" height="26.5" rx="5.25" fill="none" stroke="url(#pastaGrad)" stroke-width="1.5"/>
+  <image x="7" y="4" width="20" height="20" href="data:image/png;base64,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"/>
+  <g font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision">
+    <text x="31" y="18" fill="#334155" font-size="10" font-weight="700" letter-spacing="0.6">ARCHITECTURE</text>
+    <text x="156" y="18" fill="#FFFFFF" font-size="11.5" font-weight="800" text-anchor="middle" letter-spacing="1">PASTA</text>
+  </g>
+</svg>

@@ -15,6 +15,7 @@
 </p>
 
 <p align="center">
+  <a href="#-6-add-the-pasta-badge-to-your-project"><img src="assets/badges/pasta-flat-square.svg" alt="Architecture: PASTA" /></a>
   <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET%2010-C%23%2014-512BD4?style=flat-square&logo=dotnet" alt=".NET 10 & C# 14" /></a>
   <a href="https://www.nuget.org/packages/FunqTypes"><img src="https://img.shields.io/badge/ROP-FunqTypes-8BE9FD?style=flat-square" alt="FunqTypes" /></a>
   <a href="skills/SKILL.md"><img src="https://img.shields.io/badge/AI%20Skill-Included-FF79C6?style=flat-square" alt="AI Agent Skill Included" /></a>
@@ -27,7 +28,8 @@
   <a href="#-2-unit--slice-anatomy">Slice Anatomy</a> •
   <a href="#-3-testing-strategy--boundaries">Testing Boundaries</a> •
   <a href="#-4-sample-application-pastafit">Sample App</a> •
-  <a href="#-5-ai-agent-skill">AI Skill</a>
+  <a href="#-5-ai-agent-skill">AI Skill</a> •
+  <a href="#-6-add-the-pasta-badge-to-your-project">Badges</a>
 </p>
 
 ---
@@ -316,7 +318,10 @@ public sealed class BookingPostgresE2ETests : IAsyncLifetime
 
 ```text
 pasta-arch/
-├── assets/                          # Dark & light architecture diagrams and logos
+├── assets/
+│   ├── badges/                      # Official PASTA badges (Dark/Light SVG, Flat-Square, Shields.io JSON)
+│   ├── images/                      # Dark & light architecture and testing boundary diagrams
+│   └── logos/                       # Official PASTA logos & icons (SVG, PNG, ICO)
 ├── skills/
 │   └── SKILL.md                     # AI Coding Agent Skill for PASTA Architecture (.NET 10+)
 ├── src/
@@ -386,6 +391,53 @@ This repository includes a ready-to-use, comprehensive AI Skill at **[`skills/SK
 - Zero-allocation strongly-typed IDs (`readonly record struct`) and mock-free testing blueprints
 
 Copy [`skills/SKILL.md`](skills/SKILL.md) into your project's skills or rules directory to enforce PASTA standards automatically.
+
+---
+
+## 🎖️ 6. Add the PASTA Badge to Your Project
+
+Building a service with **PASTA Architecture**? Show it in your `README.md` with one of the official badges below:
+
+### Option A: Theme-Aware Custom Gradient Badge (Dark & Light)
+
+<p>
+  <a href="https://github.com/dnovhorodov/pasta-arch">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/badges/pasta-badge-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="assets/badges/pasta-badge-light.svg" />
+      <img alt="Architecture: PASTA" src="assets/badges/pasta-badge-light.svg" height="28" />
+    </picture>
+  </a>
+</p>
+
+```html
+<a href="https://github.com/dnovhorodov/pasta-arch">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/pasta-badge-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/pasta-badge-light.svg" />
+    <img alt="Architecture: PASTA" src="https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/pasta-badge-light.svg" height="28" />
+  </picture>
+</a>
+```
+
+### Option B: Inline Flat-Square Badge (20px — Matches Standard Badges)
+
+![Architecture: PASTA](assets/badges/pasta-flat-square.svg)
+
+```markdown
+[![Architecture: PASTA](https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/pasta-flat-square.svg)](https://github.com/dnovhorodov/pasta-arch)
+```
+
+### Option C: Dynamic Shields.io Endpoint Badge
+
+Supports any Shields.io style (`?style=flat-square`, `?style=flat`, `?style=for-the-badge`):
+
+![PASTA flat-square](https://img.shields.io/endpoint?style=flat-square&url=https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/endpoint.json)
+![PASTA for-the-badge](https://img.shields.io/endpoint?style=for-the-badge&url=https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/endpoint.json)
+
+```markdown
+[![Architecture: PASTA](https://img.shields.io/endpoint?style=flat-square&url=https://raw.githubusercontent.com/dnovhorodov/pasta-arch/main/assets/badges/endpoint.json)](https://github.com/dnovhorodov/pasta-arch)
+```
 
 ---
 
